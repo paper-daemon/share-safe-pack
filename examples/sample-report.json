@@ -1,0 +1,37 @@
+{
+  "files": 1,
+  "findings": [
+    {
+      "kind": "email",
+      "path": "examples/sample.md",
+      "line": 4,
+      "preview": "sample…"
+    },
+    {
+      "kind": "secret_like",
+      "path": "examples/sample.md",
+      "line": 5,
+      "preview": "TOKEN=…"
+    },
+    {
+      "kind": "home_path",
+      "path": "examples/sample.md",
+      "line": 6,
+      "preview": "/home/demo"
+    },
+    {
+      "kind": "draft_marker",
+      "path": "examples/sample.md",
+      "line": 3,
+      "preview": "TODO"
+    }
+  ],
+  "counts": {
+    "email": 1,
+    "phone_like": 0,
+    "secret_like": 1,
+    "private_ip": 0,
+    "home_path": 1,
+    "draft_marker": 1
+  }
+}
