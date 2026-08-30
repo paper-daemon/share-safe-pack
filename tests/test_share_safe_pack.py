@@ -15,4 +15,16 @@ class T(unittest.TestCase):
         self.assertNotIn('test@example.com',text)
         self.assertIn('<redacted:email>',text)
 
+    def test_redact_output_inside_source_is_rejected(self):
+        d=Path(tempfile.mkdtemp()); (d/'note.md').write_text('test@example.com')
+        with self.assertRaisesRegex(ValueError, 'outside the source directory'):
+            redact_copy(d,d/'safe')
+        self.assertFalse((d/'safe').exists())
+
+    def test_redact_output_cannot_overwrite_source_file(self):
+        d=Path(tempfile.mkdtemp()); p=d/'note.md'; p.write_text('test@example.com')
+        with self.assertRaisesRegex(ValueError, 'overwrite the source file'):
+            redact_copy(p,p)
+        self.assertEqual(p.read_text(),'test@example.com')
+
 if __name__=='__main__': unittest.main()
