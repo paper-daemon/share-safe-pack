@@ -39,4 +39,17 @@ class T(unittest.TestCase):
         self.assertEqual(redact_copy(d,out),0)
         self.assertFalse((out/'linked.md').exists())
 
+    def test_official_github_token_prefixes_are_detected_and_redacted(self):
+        prefixes=['ghp_','github_pat_','gho_','ghu_','ghs_','ghr_']
+        d=Path(tempfile.mkdtemp()); p=d/'tokens.txt'
+        p.write_text('\n'.join(prefix+'SyntheticTokenValue1234567890' for prefix in prefixes))
+        report=scan(d)
+        self.assertEqual(report['counts']['secret_like'],len(prefixes))
+        out=Path(tempfile.mkdtemp())/'safe'
+        self.assertEqual(redact_copy(d,out),1)
+        text=(out/'tokens.txt').read_text()
+        for prefix in prefixes:
+            self.assertNotIn(prefix,text)
+        self.assertEqual(text.count('<redacted:secret_like>'),len(prefixes))
+
 if __name__=='__main__': unittest.main()
