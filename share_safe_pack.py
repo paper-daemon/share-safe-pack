@@ -5,7 +5,7 @@ from pathlib import Path
 PATTERNS={
  'email': re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b',re.I),
  'phone_like': re.compile(r'(?<!\d)(?:\+?81[- ]?)?0\d{1,4}[- ]?\d{1,4}[- ]?\d{3,4}(?!\d)'),
- 'secret_like': re.compile(r'(?:sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{16,}|(?:api[_-]?key|token|secret|password)\s*[:=]\s*["\']?[^\s"\']{8,})',re.I),
+ 'secret_like': re.compile(r'(?:sk-[A-Za-z0-9_-]{16,}|github_pat_[A-Za-z0-9_.-]{16,}|gh[pousr]_[A-Za-z0-9_.-]{16,}|(?:api[_-]?key|token|secret|password)\s*[:=]\s*["\']?[^\s"\']{8,})',re.I),
  'private_ip': re.compile(r'\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b'),
  'home_path': re.compile(r'(?:/home/[A-Za-z0-9._-]+|/Users/[A-Za-z0-9._-]+|[A-Z]:\\Users\\[^\\\s]+)',re.I),
  'draft_marker': re.compile(r'\b(?:TODO|FIXME|DRAFT|WIP|PLACEHOLDER)\b',re.I),
