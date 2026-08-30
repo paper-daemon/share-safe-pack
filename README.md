@@ -10,6 +10,7 @@ python share_safe_pack.py ./folder --html report.html --json report.json --redac
 - メールアドレス候補
 - 電話番号候補
 - APIキー / token / password候補
+  - フォルダ走査でも `.env` / `.env.*` を対象に含める
   - GitHub公式token prefix（`ghp_`, `github_pat_`, `gho_`, `ghu_`, `ghs_`, `ghr_`）
 - プライベートIP
 - `/home/...` や `C:\Users\...` などのローカルパス
