@@ -12,13 +12,17 @@ PATTERNS={
 }
 TEXT_SUFFIXES={'.md','.txt','.html','.css','.js','.json','.yaml','.yml','.toml','.ini','.py','.csv','.tsv'}
 
+def is_text_candidate(p):
+    name=p.name.lower()
+    return p.suffix.lower() in TEXT_SUFFIXES or name == '.env' or name.startswith('.env.')
+
 def iter_files(root):
     root=Path(root)
     if root.is_file(): yield root; return
     for p in root.rglob('*'):
         if p.is_symlink():
             continue
-        if p.is_file() and p.suffix.lower() in TEXT_SUFFIXES and '.git' not in p.parts:
+        if p.is_file() and is_text_candidate(p) and '.git' not in p.parts:
             yield p
 def scan(root):
     findings=[]; files=0
