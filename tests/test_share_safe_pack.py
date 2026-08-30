@@ -64,4 +64,16 @@ class T(unittest.TestCase):
         for name in ('.env','.env.local'):
             self.assertEqual((out/name).read_text().strip(),'<redacted:secret_like>')
 
+    def test_unreadable_text_candidate_is_reported_not_silently_skipped(self):
+        d=Path(tempfile.mkdtemp()); p=d/'broken.txt'
+        p.write_bytes(b'\xff\xfe\xfa')
+        report=scan(d)
+        self.assertEqual(report['files'],1)
+        self.assertEqual(report['counts']['scan_error'],1)
+        self.assertEqual(len(report['findings']),1)
+        finding=report['findings'][0]
+        self.assertEqual(finding['kind'],'scan_error')
+        self.assertEqual(Path(finding['path']).name,'broken.txt')
+        self.assertIn('UnicodeDecodeError',finding['preview'])
+
 if __name__=='__main__': unittest.main()
