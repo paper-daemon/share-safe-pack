@@ -24,19 +24,30 @@ def iter_files(root):
             continue
         if p.is_file() and is_text_candidate(p) and '.git' not in p.parts:
             yield p
+
 def scan(root):
     findings=[]; files=0
     for p in iter_files(root):
-        try: text=p.read_text(encoding='utf-8')
-        except (UnicodeDecodeError,OSError): continue
         files+=1
+        try:
+            text=p.read_text(encoding='utf-8')
+        except (UnicodeDecodeError,OSError) as e:
+            findings.append({
+                'kind':'scan_error',
+                'path':str(p),
+                'line':0,
+                'preview':f'unreadable text candidate: {type(e).__name__}',
+            })
+            continue
         for kind,rx in PATTERNS.items():
             for m in rx.finditer(text):
                 line=text.count('\n',0,m.start())+1
                 preview=m.group(0)
                 if kind in {'email','phone_like','secret_like'}: preview=preview[:6]+'…'
                 findings.append({'kind':kind,'path':str(p),'line':line,'preview':preview[:80]})
-    return {'files':files,'findings':findings,'counts':{k:sum(1 for f in findings if f['kind']==k) for k in PATTERNS}}
+    counts={k:sum(1 for f in findings if f['kind']==k) for k in PATTERNS}
+    counts['scan_error']=sum(1 for f in findings if f['kind']=='scan_error')
+    return {'files':files,'findings':findings,'counts':counts}
 
 def redact_text(text):
     for kind,rx in PATTERNS.items():
@@ -60,6 +71,7 @@ def redact_copy(src,dst):
         try: out.write_text(redact_text(p.read_text(encoding='utf-8')),encoding='utf-8'); count+=1
         except UnicodeDecodeError: pass
     return count
+
 def render(report):
     rows=''.join(f"<tr><td>{html.escape(f['kind'])}</td><td>{html.escape(f['path'])}</td><td>{f['line']}</td><td>{html.escape(f['preview'])}</td></tr>" for f in report['findings'])
     counts=' · '.join(f'{k}:{v}' for k,v in report['counts'].items())
