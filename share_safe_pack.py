@@ -40,8 +40,14 @@ def redact_text(text):
 
 def redact_copy(src,dst):
     src=Path(src); dst=Path(dst)
+    src_abs=src.resolve()
+    dst_abs=dst.resolve(strict=False)
     if src.is_file():
+        if dst_abs == src_abs:
+            raise ValueError('redact-out must not overwrite the source file')
         dst.parent.mkdir(parents=True,exist_ok=True); dst.write_text(redact_text(src.read_text(encoding='utf-8')),encoding='utf-8'); return 1
+    if dst_abs == src_abs or src_abs in dst_abs.parents:
+        raise ValueError('redact-out must be outside the source directory')
     count=0
     for p in iter_files(src):
         rel=p.relative_to(src); out=dst/rel; out.parent.mkdir(parents=True,exist_ok=True)
