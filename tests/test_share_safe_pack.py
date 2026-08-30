@@ -52,4 +52,16 @@ class T(unittest.TestCase):
             self.assertNotIn(prefix,text)
         self.assertEqual(text.count('<redacted:secret_like>'),len(prefixes))
 
+    def test_dotenv_files_in_folder_are_scanned_and_redacted(self):
+        d=Path(tempfile.mkdtemp())
+        (d/'.env').write_text('API_KEY=syntheticvalue1234567890\n')
+        (d/'.env.local').write_text('TOKEN=syntheticvalue1234567890\n')
+        report=scan(d)
+        paths={Path(f['path']).name for f in report['findings'] if f['kind']=='secret_like'}
+        self.assertEqual(paths,{'.env','.env.local'})
+        out=Path(tempfile.mkdtemp())/'safe'
+        self.assertEqual(redact_copy(d,out),2)
+        for name in ('.env','.env.local'):
+            self.assertEqual((out/name).read_text().strip(),'<redacted:secret_like>')
+
 if __name__=='__main__': unittest.main()
